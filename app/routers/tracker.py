@@ -37,7 +37,10 @@ def _matches_domain(item: dict, domains_set: set) -> bool:
     return False
 
 @router.get("/tracking")
-def get_tracking(limit: int = Query(500, le=5000), user=Depends(client_auth)):
+def get_tracking(
+    starttime: int = Query(..., description="Unix start time"),
+    endtime: int = Query(..., description="Unix end time"),
+    user=Depends(client_auth)):
     """
     Returns tracking center entries belonging to the authenticated client's domains.
     - limit: max items to request per node (default 500)
@@ -52,7 +55,10 @@ def get_tracking(limit: int = Query(500, le=5000), user=Depends(client_auth)):
 
     # fetch all tracker items across configured hosts and nodes
     try:
-        items = pmg_api.get_all_tracker(params=None, limit_per_node=limit)
+        items = pmg_api.get_all_tracker(params={
+            "starttime": starttime,
+            "endtime": endtime
+        })
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"PMG API error: {e}")
 

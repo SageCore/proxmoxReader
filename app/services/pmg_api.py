@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 
 load_dotenv()
 
-PMG_HOSTS = os.getenv("PMG_HOSTS", "atp1.hostwithcloud.com:8006,atp3.hostwithcloud.com:8006").split(",")
+PMG_HOSTS = os.getenv("PMG_HOSTS").split(",")
 PMG_USERNAME = os.getenv("PMG_USERNAME")
 PMG_PASSWORD = os.getenv("PMG_PASSWORD")
 PMG_VERIFY_SSL = os.getenv("PMG_VERIFY_SSL", "false").lower() in ("true", "1", "yes")
@@ -107,7 +107,9 @@ def get_all_tracker(params: Optional[Dict[str, Any]] = None, limit_per_node: int
 
         for node in nodes:
             try:
-                items = get_tracker_for_node(host, node, params={"limit": limit_per_node})
+                query_params = params if params else None
+
+                items = get_tracker_for_node(host, node, params=query_params)
                 for it in items:
                     it["_pmg_host"] = host
                     it["_pmg_node"] = node
